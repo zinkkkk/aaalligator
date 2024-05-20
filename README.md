@@ -10,3 +10,5 @@ I ended up having to make two variants of the code aaaxf (floating point functio
 Weirdly i seem to have issues running this program in debug (non --release mode) that seems to cause an overflow but only on windows and not in Linux but can be fixed by turning opt-level = 1 for the dev profile.
 
 There are several usage examples with poles and zeros generated however i think the actual representation should be returned slightly differently i have more work to do to make it do the same as other packages this is just what i have so far :|
+
+No i have not worked out how to make the returned function r callable yet too much rust lifetimes making things confusing :\
