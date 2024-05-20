@@ -1,0 +1,23 @@
+[package]
+name = "aaalligator"
+version = "0.1.0"
+edition = "2021"
+authors = ["zinkkkk"]
+repository = "https://github.com/zinkkkk/aaalligator"
+license = "MIT"
+keywords = ["AAA", "function approximation", "rational approximation"]
+readme = "README.md"
+
+[dependencies]
+faer = "0.18.2"
+num-complex = "0.4.6"
+
+[dev-dependencies]
+rayon = "1.10.0"
+
+[profile.release]
+opt-level = 3
+lto = true
+
+[profile.dev]
+opt-level = 1
