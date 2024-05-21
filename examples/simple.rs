@@ -11,6 +11,9 @@ fn main() {
 
     println!("f: {:?}", f(&0.5));
     println!("r: {:?}", (r)(&0.5));
+
+    println!("f(x) - r(x) {}", f(&0.5) - r(&0.5));
+
     let mut sum_difference = 0.0;
     let step: f64 = 0.01;
     let mut x = -1.0; // Starting point

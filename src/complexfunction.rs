@@ -92,14 +92,14 @@ where
 
     let fs: Vec<Complex64> = s.iter().map(|&si| f(&si.into())).collect();
 
-    let s_clone = s.clone(); // Clone s before moving it into the closure
+    let s_clone = s.clone(); 
 
     let (pol, res, zer) = prz(&s, &fs, &w); // poles, residues, zeros
 
     let xx: Vec<f64> = xs(&s, &30);
 
     let r = move |x: &Complex64| {
-        evaluator(&s, &fs, &w)(*x) // Call the evaluator closure
+        evaluator(&s, &fs, &w)(*x)
     };
 
     let ee: Vec<Complex64> = xx.iter().map(|&x| f(&x.into()) - r(&x.into())).collect(); // COMPUTE ERROR AND PLOT

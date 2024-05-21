@@ -95,7 +95,7 @@ where
 
     let s_clone = s.clone(); // Clone s before moving it into the closure
 
-    let (pol, res, zer) = prz(&s, &fs, &w); // poles, residues, zeros
+    let (pol, res, zer) = prz(&s_clone, &fs, &w); // poles, residues, zeros
 
     let xx: Vec<f64> = xs(&s, &30);
 
@@ -166,7 +166,7 @@ fn poles(zj: &[f64], wj: &[f64]) -> Vec<Complex64>
     let mut pol: Vec<Complex64> = e.eigenvalues()
     .iter()
     .map(|&f: &Complex64| Complex64::ONE / f)
-    .filter(|&f: &Complex64| f.abs() < 1e4)
+    .filter(|&f: &Complex64| f.abs() < 1e14)
     .collect();
 
     pol.sort_by(|a, b|a.re().partial_cmp(&b.re()).unwrap());
@@ -186,7 +186,7 @@ fn residues(pol: &[Complex64], zj: &[f64], fj: &[f64], wj: &[f64]) -> Vec<Comple
 
     let res: Vec<Complex64> = pol.iter()
         .map(|&p| n(p) / ddiff(p))
-        //.filter(|&f: &Complex64| f != Complex64::ZERO && f.abs() < 1e14)
+        .filter(|&f: &Complex64| f != Complex64::ZERO && f.abs() < 1e14)
         .collect();
 
     res
@@ -211,7 +211,7 @@ fn zeros(zj: &[f64], fj: &[f64], wj: &[f64]) -> Vec<Complex64> {
     let mut zerfiltered: Vec<Complex64> = zer.eigenvalues()
         .iter()
         .map(|&f: &Complex64| Complex64::ONE / f)
-        .filter(|&f: &Complex64| f != Complex64::ZERO && f.abs() < 1e4)
+        .filter(|&f: &Complex64| f != Complex64::ZERO && f.abs() < 1e14)
         .collect();
 
     zerfiltered.sort_by(|a, b| a.re().partial_cmp(&b.re()).unwrap());
@@ -234,28 +234,5 @@ fn xs(s: &[f64], p: &usize) -> Vec<f64> {
             result.push(s_val + d_val * diff_val);
         }
     }
-
     result
 }
-
-// fn evaluator<'a>(zj: &'a [f64], fj: &'a [f64], wj: &'a [f64]) -> Box<dyn Fn(f64) -> f64 + 'a> {
-//     Box::new(move |z: f64| { 
-//         if z.is_infinite() {
-//             return wj.iter().zip(fj.iter()).map(|(&wj_k, &fj_k)| wj_k * fj_k).sum::<f64>() / wj.iter().sum::<f64>();
-//         }
-
-//         if let Some(k) = &zj.iter().position(|&zj_k| z == zj_k) {
-//             fj[*k]
-//         } else {
-//             let c: Vec<f64> = zj.iter().map(|&zj_k| 1.0 / (z - zj_k)).collect();
-//             let numerator: f64 = c
-//                 .iter()
-//                 .zip(wj.iter())
-//                 .zip(fj.iter())
-//                 .map(|((&c_k, &wj_k), &fj_k)| c_k * wj_k * fj_k)
-//                 .sum();
-//             let denominator: f64 = c.iter().zip(wj.iter()).map(|(&c_k, &wj_k)| c_k * wj_k).sum();
-//             numerator / denominator
-//         }
-//     })
-// }
