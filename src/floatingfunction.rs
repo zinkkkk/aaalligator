@@ -1,8 +1,8 @@
 use num_complex::{Complex64, ComplexFloat};
 use faer::{solvers::SpSolver, Mat};
-use crate::AaaxResult;
+use crate::AAAxfResult;
 
-pub fn aaaxf<F>(f: &F, degree: &usize, _lawson: &usize, tol: &f64) -> AaaxResult
+pub fn aaaxf<'a, F>(f: &'a F, degree: &'a usize, _lawson: &'a usize, tol: &'a f64) -> Option<AAAxfResult<'a>>
 where
     F: Fn(&f64) -> f64,
 {
@@ -11,15 +11,7 @@ where
     let err: f64 = f0.iter().map(|x| x.powi(2)).sum::<f64>().sqrt(); // ...or degree==0
 
     if err == 0.0 || *degree == 0 {
-
-        return AaaxResult {
-            poles: vec![],
-            residues: vec![],
-            zeros: vec![],
-            final_error: 0.0,
-            support_points: s,
-            vals: vec![],
-        };
+        return None;
     }
 
     let mut best: Option<(usize, Vec<f64>, Vec<f64>)> = None; // track the best so far
@@ -98,21 +90,53 @@ where
 
 
     let (_, s, w) = best.unwrap();
+
     let fs: Vec<f64> = s.iter().map(|&si| f(&si)).collect();
-    let r = evaluator(&s, &fs, &w); // create callable function
+
+    let s_clone = s.clone(); // Clone s before moving it into the closure
+
     let (pol, res, zer) = prz(&s, &fs, &w); // poles, residues, zeros
+
     let xx: Vec<f64> = xs(&s, &30);
-    let ee: Vec<f64> = xx.iter().map(|&x| f(&x) - r(x)).collect(); // COMPUTE ERROR AND PLOT
+
+    let r = move |x: &f64| {
+        evaluator(&s, &fs, &w)(*x) // Call the evaluator closure
+    };
+
+    let ee: Vec<f64> = xx.iter().map(|&x| f(&x) - r(&x)).collect(); // COMPUTE ERROR AND PLOT
     let final_err = ee.iter().map(|e| e.abs()).max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap(); // Find maximum absolute error
 
-    AaaxResult {
+    Some(AAAxfResult {
+        r: Box::new(r),
         poles: pol,
         residues: res,
         zeros: zer,
         final_error: final_err,
-        support_points: s.clone(),
+        support_points: s_clone,
         vals: xx,
-    }
+    })
+}
+
+fn evaluator<'a>(zj: &'a [f64], fj: &'a [f64], wj: &'a [f64]) -> Box<dyn Fn(f64) -> f64 + 'a> {
+    Box::new(move |z: f64| { 
+        if z.is_infinite() {
+            return wj.iter().zip(fj.iter()).map(|(&wj_k, &fj_k)| wj_k * fj_k).sum::<f64>() / wj.iter().sum::<f64>();
+        }
+
+        if let Some(k) = zj.iter().position(|&zj_k| z == zj_k) {
+            fj[k]
+        } else {
+            let c: Vec<f64> = zj.iter().map(|&zj_k| 1.0 / (z - zj_k)).collect();
+            let numerator: f64 = c
+                .iter()
+                .zip(wj.iter())
+                .zip(fj.iter())
+                .map(|((&c_k, &wj_k), &fj_k)| c_k * wj_k * fj_k)
+                .sum();
+            let denominator: f64 = c.iter().zip(wj.iter()).map(|(&c_k, &wj_k)| c_k * wj_k).sum();
+            numerator / denominator
+        }
+    })
 }
 
 fn prz(zj: &[f64], fj: &[f64], wj: &[f64]) -> (Vec<Complex64>, Vec<Complex64>, Vec<Complex64>) {
@@ -142,7 +166,7 @@ fn poles(zj: &[f64], wj: &[f64]) -> Vec<Complex64>
     let mut pol: Vec<Complex64> = e.eigenvalues()
     .iter()
     .map(|&f: &Complex64| Complex64::ONE / f)
-    .filter(|&f: &Complex64| f.abs() < 1e14)
+    .filter(|&f: &Complex64| f.abs() < 1e4)
     .collect();
 
     pol.sort_by(|a, b|a.re().partial_cmp(&b.re()).unwrap());
@@ -187,7 +211,7 @@ fn zeros(zj: &[f64], fj: &[f64], wj: &[f64]) -> Vec<Complex64> {
     let mut zerfiltered: Vec<Complex64> = zer.eigenvalues()
         .iter()
         .map(|&f: &Complex64| Complex64::ONE / f)
-        .filter(|&f: &Complex64| f != Complex64::ZERO && f.abs() < 1e14)
+        .filter(|&f: &Complex64| f != Complex64::ZERO && f.abs() < 1e4)
         .collect();
 
     zerfiltered.sort_by(|a, b| a.re().partial_cmp(&b.re()).unwrap());
@@ -214,24 +238,24 @@ fn xs(s: &[f64], p: &usize) -> Vec<f64> {
     result
 }
 
-fn evaluator<'a>(zj: &'a [f64], fj: &'a [f64], wj: &'a [f64]) -> Box<dyn Fn(f64) -> f64 + 'a> {
-    Box::new(move |z: f64| { 
-        if z.is_infinite() {
-            return wj.iter().zip(fj.iter()).map(|(&wj_k, &fj_k)| wj_k * fj_k).sum::<f64>() / wj.iter().sum::<f64>();
-        }
+// fn evaluator<'a>(zj: &'a [f64], fj: &'a [f64], wj: &'a [f64]) -> Box<dyn Fn(f64) -> f64 + 'a> {
+//     Box::new(move |z: f64| { 
+//         if z.is_infinite() {
+//             return wj.iter().zip(fj.iter()).map(|(&wj_k, &fj_k)| wj_k * fj_k).sum::<f64>() / wj.iter().sum::<f64>();
+//         }
 
-        if let Some(k) = &zj.iter().position(|&zj_k| z == zj_k) {
-            fj[*k]
-        } else {
-            let c: Vec<f64> = zj.iter().map(|&zj_k| 1.0 / (z - zj_k)).collect();
-            let numerator: f64 = c
-                .iter()
-                .zip(wj.iter())
-                .zip(fj.iter())
-                .map(|((&c_k, &wj_k), &fj_k)| c_k * wj_k * fj_k)
-                .sum();
-            let denominator: f64 = c.iter().zip(wj.iter()).map(|(&c_k, &wj_k)| c_k * wj_k).sum();
-            numerator / denominator
-        }
-    })
-}
+//         if let Some(k) = &zj.iter().position(|&zj_k| z == zj_k) {
+//             fj[*k]
+//         } else {
+//             let c: Vec<f64> = zj.iter().map(|&zj_k| 1.0 / (z - zj_k)).collect();
+//             let numerator: f64 = c
+//                 .iter()
+//                 .zip(wj.iter())
+//                 .zip(fj.iter())
+//                 .map(|((&c_k, &wj_k), &fj_k)| c_k * wj_k * fj_k)
+//                 .sum();
+//             let denominator: f64 = c.iter().zip(wj.iter()).map(|(&c_k, &wj_k)| c_k * wj_k).sum();
+//             numerator / denominator
+//         }
+//     })
+// }

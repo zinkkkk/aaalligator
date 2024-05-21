@@ -1,4 +1,4 @@
-use aaalligator::{aaaxc, aaaxf};
+use aaalligator::{aaaxf, aaaxc};
 use num_complex::Complex64;
 
 fn main() {
@@ -6,20 +6,37 @@ fn main() {
     // floating point function approximations
 
     println!("f = x -> exp(cos(4x) - sin(3x))");
-    let a = aaaxf(&f, &150, &0, &(1000.0*f64::EPSILON));
+    let a = aaaxf(&f, &150, &0, &(1000.0*f64::EPSILON)).unwrap();
+    let r = aaaxf(&f, &150, &0, &(1000.0*f64::EPSILON)).unwrap().r;
+
+    println!("f: {:?}", f(&0.5));
+    println!("r: {:?}", (r)(&0.5));
+    let mut sum_difference = 0.0;
+    let step: f64 = 0.01;
+    let mut x = -1.0; // Starting point
+    while x <= 1.0 { // Iterate until x is greater than 1.0
+        sum_difference += f(&x) - r(&x);
+        x += step; // Increment by the step size
+    }
+    println!("Sum of f(x) - r(x) over [-1, 1]: {:?}", sum_difference);
+
+
     println!("Poles:");
+    println!("Poles len : {}", a.poles.len());
     for i in a.poles {
     println!("{}", i)    
     }
     println!();
     println!("Zeros:");
+    println!("Poles len : {}", a.zeros.len());
     for i in a.zeros {
     println!("{}", i)    
     }
     println!("\nfinal error {:?}\n", a.final_error);
 
+
     println!("f = x -> tanh(10*(x - 0.1)^2)");
-    let b = aaaxf(&f2, &150, &0, &(1000.0*f64::EPSILON));
+    let b = aaaxf(&f2, &150, &0, &(1000.0*f64::EPSILON)).unwrap();
     println!("Poles:");
     for i in b.poles {
     println!("{}", i)    
@@ -34,7 +51,7 @@ fn main() {
     // complex function approximations
 
     println!("f = z -> (z^3 - 1) / sin(z - 0.9 - 1im)");
-    let c = aaaxc(&fc, &150, &0, &(1000.0*f64::EPSILON));
+    let c = aaaxc(&fc, &150, &0, &(1000.0*f64::EPSILON)).unwrap();
     println!("Poles:");    
     for i in c.poles {
     println!("{}", i)    
@@ -47,7 +64,7 @@ fn main() {
     println!("\nfinal error {:?}\n", c.final_error);
 
     println!("f = z -> sqrt(1.0 - (1.0 / z^2 + z^3))");
-    let d = aaaxc(&fc2, &150, &0, &(1000.0*f64::EPSILON));
+    let d = aaaxc(&fc2, &150, &0, &(1000.0*f64::EPSILON)).unwrap();
     println!("Poles:");    
     for i in d.poles {
     println!("{}", i)    
