@@ -75,7 +75,7 @@ where
             if err.len() >= best_m { // Ensure err has enough elements 
                 let is_low = err[best_m - 1] / fmax < 1e-2;
 
-                if (bad == 0 && err.last().unwrap() / fmax <= *tol)
+                if (bad > 0 && err.last().unwrap() / fmax <= *tol)
                     || m == (degree + 1).try_into().unwrap()
                     || (m - best_m as i32 >= 10 && is_low)
                 {
@@ -186,7 +186,7 @@ fn residues(pol: &[Complex64], zj: &[f64], fj: &[f64], wj: &[f64]) -> Vec<Comple
 
     let res: Vec<Complex64> = pol.iter()
         .map(|&p| n(p) / ddiff(p))
-        .filter(|&f: &Complex64| f != Complex64::ZERO && f.abs() < 1e4)
+        //.filter(|&f: &Complex64| f != Complex64::ZERO && f.abs() < 1e4)
         .collect();
 
     res
@@ -211,7 +211,7 @@ fn zeros(zj: &[f64], fj: &[f64], wj: &[f64]) -> Vec<Complex64> {
     let mut zerfiltered: Vec<Complex64> = zer.eigenvalues()
         .iter()
         .map(|&f: &Complex64| Complex64::ONE / f)
-        .filter(|&f: &Complex64| f != Complex64::ZERO && f.abs() < 1e14)
+        .filter(|&f: &Complex64| f != Complex64::ZERO && f.abs() < 1e4)
         .collect();
 
     zerfiltered.sort_by(|a, b| a.re().partial_cmp(&b.re()).unwrap());

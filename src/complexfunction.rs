@@ -74,7 +74,7 @@ where
             if err.len() >= best_m { // Ensure err has enough elements 
                 let is_low = err[best_m - 1] / fmax < 1e-2;
 
-                if (bad == 0 && err.last().unwrap() / fmax <= *tol)
+                if (bad > 0 && err.last().unwrap() / fmax <= *tol)
                     || m == (degree + 1).try_into().unwrap()
                     || (m - best_m as i32 >= 10 && is_low)
                 {
