@@ -16,10 +16,10 @@ fn main() {
 
     let mut sum_difference = 0.0;
     let step: f64 = 0.01;
-    let mut x = -1.0; // Starting point
-    while x <= 1.0 { // Iterate until x is greater than 1.0
+    let mut x = -1.0; 
+    while x <= 1.0 { 
         sum_difference += f(&x) - r(&x);
-        x += step; // Increment by the step size
+        x += step;
     }
     println!("Sum of f(x) - r(x) over [-1, 1]: {:?}", sum_difference);
 

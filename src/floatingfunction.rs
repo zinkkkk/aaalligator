@@ -166,7 +166,7 @@ fn poles(zj: &[f64], wj: &[f64]) -> Vec<Complex64>
     let mut pol: Vec<Complex64> = e.eigenvalues()
     .iter()
     .map(|&f: &Complex64| Complex64::ONE / f)
-    .filter(|&f: &Complex64| f.abs() < 1e14)
+    .filter(|&f: &Complex64| f.abs() < 1e4)
     .collect();
 
     pol.sort_by(|a, b|a.re().partial_cmp(&b.re()).unwrap());
@@ -186,7 +186,7 @@ fn residues(pol: &[Complex64], zj: &[f64], fj: &[f64], wj: &[f64]) -> Vec<Comple
 
     let res: Vec<Complex64> = pol.iter()
         .map(|&p| n(p) / ddiff(p))
-        .filter(|&f: &Complex64| f != Complex64::ZERO && f.abs() < 1e14)
+        .filter(|&f: &Complex64| f != Complex64::ZERO && f.abs() < 1e4)
         .collect();
 
     res
