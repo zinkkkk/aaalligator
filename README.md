@@ -1,7 +1,7 @@
 <p align="center">
 <img src="img/aaalligator3.jpg" />
 
-An attempt at implementing a rust variant of the methods described in "AAA ratio
+An attempt at implementing a rust variant of the methods described in "AAA rational approximation on a continuum" 2023 (Toby Driscoll, Yuji Nakatsukasa, Lloyd N. Trefethen) 10.48550/arXiv.2305.03677 https://arxiv.org/abs/2305.03677
  
 Forgive me am i fairly new to programming so i'm pretty sure this code is full of bugs and things i can't work out how to fix yet. It's also missing a fair few features mentioned in the paper like lawson iterations and domains other than [-1, 1] and there are a few logic issues in the code but it otherwise appears to mostly work! :)
 
