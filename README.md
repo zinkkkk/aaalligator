@@ -1,5 +1,5 @@
-<div style="text-align:center"><img src="img/aaalligator3.jpg" />
-
+<p align="center">
+<img src="img/aaalligator3.jpg" />
 
 An attempt at implementing a rust variant of the methods described in "AAA ratio
  
@@ -10,7 +10,7 @@ I ended up having to make two variants of the code aaaxf (floating point functio
 There are several usage examples with poles and zeros generated however i think the actual representation should be returned slightly differently i have more work to do to make it do the same as other packages this is just what i have so far.
 
 No i have not worked out how to make the returned function r callable yet too much rust lifetimes making things confusing..
-</div>
+</p>
 
 ## usage example
 ```
