@@ -9,7 +9,7 @@ I ended up having to make two variants of the code aaaxf (floating point functio
 </p>
 
 ## usage example
-```
+```rust
 use aaalligator::aaaxf;
 
 fn f(x: &f64) -> f64 {
@@ -33,7 +33,7 @@ let r = aaaxf(&f, &150, &0, &(1000.0*f64::EPSILON)).unwrap().r;
     }
     println!("\nfinal error {:?}\n", a.final_error);
 ```
-```
+```rust
 f(0.5) - r(0.5) 5.570544026056723e-14
 
 Poles:
