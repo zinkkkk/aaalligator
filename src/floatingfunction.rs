@@ -1,5 +1,4 @@
-use num_complex::{Complex64, ComplexFloat};
-use faer::{solvers::SpSolver, Mat};
+use faer::{complex_native::c64, solvers::SpSolver, ComplexField, Mat};
 use crate::AAAxfResult;
 
 pub fn aaaxf<'a, F>(f: &'a F, degree: &'a usize, _lawson: &'a usize, tol: &'a f64) -> Option<AAAxfResult<'a>>
@@ -59,7 +58,7 @@ where
         let err_val: f64 = fx.iter().zip(r.iter()).map(|(fx, r)| (fx - r).abs()).max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap(); // track max error
         err.push(err_val);
 
-        let pol: Vec<Complex64> = poles(&s, &w); //poles of this approximant
+        let pol: Vec<c64> = poles(&s, &w); //poles of this approximant
 
         let bad = pol.iter().filter(|&p| p.im == 0.0 && p.abs() <= 1.0).count(); // flag bad poles
         nbad.push(bad); // track number of bad poles
@@ -139,14 +138,14 @@ fn evaluator<'a>(zj: &'a [f64], fj: &'a [f64], wj: &'a [f64]) -> Box<dyn Fn(f64)
     })
 }
 
-fn prz(zj: &[f64], fj: &[f64], wj: &[f64]) -> (Vec<Complex64>, Vec<Complex64>, Vec<Complex64>) {
+fn prz(zj: &[f64], fj: &[f64], wj: &[f64]) -> (Vec<c64>, Vec<c64>, Vec<c64>) {
     let pol = poles(zj, wj);
     let res = residues(&pol, zj, fj, wj);
     let zer = zeros(zj, fj, wj);
     (pol, res, zer) 
 }
 
-fn poles(zj: &[f64], wj: &[f64]) -> Vec<Complex64>
+fn poles(zj: &[f64], wj: &[f64]) -> Vec<c64>
 {
     let wj = wj.iter().filter(|&f| *f != 0.0).cloned().collect::<Vec<f64>>();
     let m = wj.len();
@@ -163,10 +162,10 @@ fn poles(zj: &[f64], wj: &[f64]) -> Vec<Complex64>
 
     let e: Mat<f64> = etemp.qr().solve(&b);
 
-    let mut pol: Vec<Complex64> = e.eigenvalues()
+    let mut pol: Vec<c64> = e.eigenvalues()
     .iter()
-    .map(|&f: &Complex64| Complex64::ONE / f)
-    .filter(|&f: &Complex64| f.abs() < 1e4)
+    .map(|&f: &c64| c64::faer_one() / f)
+    .filter(|&f: &c64| f.abs() < 1e4)
     .collect();
 
     pol.sort_by(|a, b|a.re().partial_cmp(&b.re()).unwrap());
@@ -174,25 +173,25 @@ fn poles(zj: &[f64], wj: &[f64]) -> Vec<Complex64>
     pol
 }
 
-fn residues(pol: &[Complex64], zj: &[f64], fj: &[f64], wj: &[f64]) -> Vec<Complex64> {
+fn residues(pol: &[c64], zj: &[f64], fj: &[f64], wj: &[f64]) -> Vec<c64> {
 
-    let n = |t: Complex64| zj.iter().zip(fj.iter()).zip(wj.iter())
-        .map(|((x, y), w)| *y * *w / (t - Complex64::new(*x, 0.0)))
-        .sum::<Complex64>();
+    let n = |t: c64| zj.iter().zip(fj.iter()).zip(wj.iter())
+        .map(|((x, y), w)| *y * *w / (t - c64::new(*x, 0.0)))
+        .sum::<c64>();
 
-    let ddiff = |t: Complex64| zj.iter().zip(wj.iter())
-        .map(|(&x, &w)| -w / (t - Complex64::new(x, 0.0)).powi(2))
-        .sum::<Complex64>();
+    let ddiff = |t: c64| zj.iter().zip(wj.iter())
+        .map(|(&x, &w)| -w / (t - c64::new(x, 0.0)).powi(2))
+        .sum::<c64>();
 
-    let res: Vec<Complex64> = pol.iter()
+    let res: Vec<c64> = pol.iter()
         .map(|&p| n(p) / ddiff(p))
-        //.filter(|&f: &Complex64| f != Complex64::ZERO && f.abs() < 1e4)
+        //.filter(|&f: &c64| f != c64::ZERO && f.abs() < 1e4)
         .collect();
 
     res
 }
 
-fn zeros(zj: &[f64], fj: &[f64], wj: &[f64]) -> Vec<Complex64> {
+fn zeros(zj: &[f64], fj: &[f64], wj: &[f64]) -> Vec<c64> {
 
     let m = wj.len();
     let mut e: Mat<f64> = Mat::zeros(m + 1, m + 1);
@@ -208,10 +207,10 @@ fn zeros(zj: &[f64], fj: &[f64], wj: &[f64]) -> Vec<Complex64> {
 
     let zer = e.qr().solve(&b);
 
-    let mut zerfiltered: Vec<Complex64> = zer.eigenvalues()
+    let mut zerfiltered: Vec<c64> = zer.eigenvalues()
         .iter()
-        .map(|&f: &Complex64| Complex64::ONE / f)
-        .filter(|&f: &Complex64| f != Complex64::ZERO && f.abs() < 1e4)
+        .map(|&f: &c64| c64::faer_one() / f)
+        .filter(|&f: &c64| f != c64::faer_one() && f.abs() < 1e4)
         .collect();
 
     zerfiltered.sort_by(|a, b| a.re().partial_cmp(&b.re()).unwrap());

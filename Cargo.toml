@@ -9,11 +9,10 @@ keywords = ["AAA", "function approximation", "rational approximation"]
 readme = "README.md"
 
 [dependencies]
-faer = "0.18.2"
-num-complex = "0.4.6"
+faer = "0.19.0"
 
-[dev-dependencies]
-rayon = "1.10.0"
+# [dev-dependencies]
+# rayon = "1.10.0"
 
 [profile.release]
 opt-level = 3

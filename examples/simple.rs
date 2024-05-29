@@ -1,5 +1,5 @@
 use aaalligator::{aaaxf, aaaxc};
-use num_complex::Complex64;
+use faer::{complex_native::c64, ComplexField};
 
 fn main() {
 
@@ -12,7 +12,7 @@ fn main() {
     println!("f: {:?}", f(&0.5));
     println!("r: {:?}", (r)(&0.5));
 
-    println!("f(x) - r(x) {}", f(&0.5) - r(&0.5));
+    println!("f(x) - r(x) {:?}", f(&0.5) - r(&0.5));
 
     let mut sum_difference = 0.0;
     let step: f64 = 0.01;
@@ -88,10 +88,10 @@ fn f2(x: &f64) -> f64 {
     (10.0 * (x - 0.1).powi(2)).tanh()
 }
 
-fn fc(z: &Complex64) -> Complex64 {
-    (z.powi(3) - Complex64::ONE) / Complex64::sin(z - (Complex64::new(0.9, 1.0)))
+fn fc(z: &c64) -> c64 {
+    (z.powi(3) - c64::faer_one()) / c64::sin(*z - (c64::new(0.9, 1.0)))
 }
 
-fn fc2(z: &Complex64) -> Complex64 {
+fn fc2(z: &c64) -> c64 {
   (1.0 - (1.0 / z.powf(2.0) + z.powf(3.0))).sqrt()
 }
