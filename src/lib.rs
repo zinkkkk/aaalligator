@@ -1,25 +1,21 @@
-pub mod floatingfunction;
-pub mod complexfunction;
-pub use crate::floatingfunction::aaaxf;
-pub use crate::complexfunction::aaaxc;
-use faer::complex_native::c64;
+pub mod barycentric;
 
-pub struct AAAxfResult<'a> {
-    pub r: Box<dyn Fn(&f64) -> f64 + 'a>,
-    pub poles: Vec<c64>,
-    pub residues: Vec<c64>,
-    pub zeros: Vec<c64>,
-    pub final_error: f64,
-    pub support_points: Vec<f64>,
-    pub vals: Vec<f64>
-}
+pub mod types;
 
-pub struct AAAxcResult<'a> {
-    pub r: Box<dyn Fn(&c64) -> c64 + 'a + Send>,
-    pub poles: Vec<c64>,
-    pub residues: Vec<c64>,
-    pub zeros: Vec<c64>,
-    pub final_error: f64,
-    pub support_points: Vec<f64>,
-    pub vals: Vec<f64>
+pub mod aaa;
+pub use aaa::*;
+
+pub mod util;
+pub use util::*;
+
+mod continuum_tests;
+
+/// struct containing the rational approximation
+#[derive(Debug, Clone, Default)]
+pub struct Barycentric<T> {
+    pub nodes: Vec<T>,
+    pub values: Vec<T>,
+    pub weights: Vec<T>,
+    pub weightsxvals: Vec<T>,
+    pub error: f64,
 }

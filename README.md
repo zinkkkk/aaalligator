@@ -1,69 +1,101 @@
 <p align="center">
-<img src="img/aaalligator3.jpg" />
+<img src="img/aaalligator3.jpg"/>
 
-An attempt at implementing a rust variant of the methods described in "AAA rational approximation on a continuum" 2023 (Toby Driscoll, Yuji Nakatsukasa, Lloyd N. Trefethen) 10.48550/arXiv.2305.03677 https://arxiv.org/abs/2305.03677
+A rust variant of the AAA method described in "AAA rational approximation on a continuum" 2023 (Toby Driscoll, Yuji Nakatsukasa, Lloyd N. Trefethen) 10.48550/arXiv.2305.03677 https://arxiv.org/abs/2305.03677
  
-Forgive me am i fairly new to programming so i'm pretty sure this code is full of bugs and things i can't work out how to fix yet. It's also missing a fair few features mentioned in the paper like lawson iterations and domains other than [-1, 1] and there are a few logic issues in the code but it otherwise appears to mostly work! :)
+This crate was taken down for a while for some refactoring that is mostly done, the main AAA functions are now generic over floats and Complex type but most of the supporting code like plotting and sinularaties have not been finished but are mostly implemented for f64 and Complex<f64>. Trying to get all the generics play nice is a bit of a chore...
 
-I ended up having to make two variants of the code aaaxf (floating point functions) and aaaxc (complex functions) due to not knowing if there was a way to force rust to take either as an input like matlab and julia both often seem to have automatic type conversion.
 </p>
 
 ## usage example
 ```rust
-use aaalligator::aaaxf;
+use aaalligator::*;
 
-fn f(x: &f64) -> f64 {
-    f64::exp(f64::cos(4.0 * x) - f64::sin(3.0 * x))
+fn f_f64(x: f64) -> f64 {
+    ((4.0 * x).cos() - (3.0 * x).sin()).exp()
 }
 
-let a = aaaxf(&f, &150, &0, &(1000.0*f64::EPSILON)).unwrap();
-let r = aaaxf(&f, &150, &0, &(1000.0*f64::EPSILON)).unwrap().r;
+    let r = f_f64.into_bary();
+    r.print_info();
+    r.przr().print_przr_info();
+    r.draw();
 
-
-    println!("f(x) - r(x) {:?}", f(&0.5) - r(&0.5));
-
-    println!("Poles:");
-    for i in a.poles {
-    println!("{}", i)    
-    }
-    println!();
-    println!("Zeros:");
-    for i in a.zeros {
-    println!("{}", i)    
-    }
-    println!("\nfinal error {:?}\n", a.final_error);
 ```
+
 ```rust
-f(0.5) - r(0.5) 5.570544026056723e-14
+Degree 22
 
-Poles:
--1.4251836349051166-0.55103515549739i
--1.4251836349051166+0.55103515549739i
--1.2793065037823754+-0i
--0.3443656711931881-0.6997077840817748i
--0.3443656711931881+0.6997077840817748i
-....
+Error 1.6431300764452317e-14
 
-Zeros:
--1.279249421913843+-0i
--0.9766906199466148-0.6647089658203892i
--0.9766906199466148+0.6647089658203892i
--0.8086181116012913-0.6725072603508072i
--0.8086181116012913+0.6725072603508072i
--0.654947258895926-0.7054914738178846i
--0.654947258895926+0.7054914738178846i
+Nodes
+-1.0
+1.0
+-0.06666666666666665
+-0.33333333333333326
 ...
 
-final error 3.643974011424689e-12
+Values
+0.5989820710380285
+0.45168798828143364
+3.2005541798850548
+...
+
+Weights
+-0.004582229879077056
+0.002435207049872172
+0.06184793838124244
+...
+
+Weights * Values
+-0.0027446735429419097
+0.0010999537734055261
+0.1979476777033588
+...
+
+Poles
+Complex { re: -2.404184602256414, im: 0.0 }
+Complex { re: -1.4342261649870018, im: 0.6069887446071661 }
+Complex { re: -1.4342261649870018, im: -0.6069887446071661 }
+Complex { re: 1.4526683103120026, im: 0.38863788302032 }
+Complex { re: 1.4526683103120026, im: -0.38863788302032 }
+...
+
+Residues
+Complex { re: 5.034382918460181e-9, im: 0.0 }
+Complex { re: 1.1446996154852947e-8, im: 2.200502304289411e-8 }
+Complex { re: 1.1446996154852947e-8, im: -2.200502304289411e-8 }
+Complex { re: 4.102617540837985e-8, im: 7.146164456205166e-8 }
+Complex { re: 4.102617540837985e-8, im: -7.146164456205166e-8 }
+...
+
+Zeros
+Complex { re: -1.9355732206039633, im: 0.0 }
+Complex { re: -1.0220808923947649, im: 0.6850924714740876 }
+Complex { re: -1.0220808923947649, im: -0.6850924714740876 }
+Complex { re: -0.8702320603690563, im: 0.6811911765742834 }
+Complex { re: -0.8702320603690563, im: -0.6811911765742834 }
 ```
+<img src="img/f64_function.jpg"/>
+
+Complex example:
+
+```rust
+fn kite(t: Complex64) -> Complex64 {
+    let input_param = t.re();
+
+    let t = (input_param + 1.0) * 0.5 * TAU;
+
+    let x = 2.2 * t.cos() + 1.25 * (2.0 * t).cos() - 1.25;
+    let y = 3.0 * t.sin();
+
+    Complex64::new(x, y)
+}
+
+let r = kite.into_bary();
+r.draw_with_pz();
+```
+<img src="img/complex_kite.jpg"/>
 
 ## bugs / todo
-- lawson iterations not added at all
-- "imaginary axis or right half-plane" (aaai) and "unit circle or disk" (aaaz) not implemented
-- mystery very larges poles/zeros after solving eigenvalues that don't appear in julia/matlab
-- sometimes results are a bit off from other versions? something to do with the loop exit conditions maybe
-- after adding callable r the parallel examples broke and i don't know how to fix :\
-- the last iteration inside the loop doesn't seem to get saved(?) and the final poles comes out one short? urgh
-- debug builds compiled without opt-level = 1 or higher crash with stack overflow on windows (at least for me)
-- ideally this package would be made closer in implementation to the cleaner/better version of the AAA at https://github.com/complexvariables/RationalFunctionApproximation.jl
-- would be nice to implement a domain colouring method for visualisation of the functions and graphing functionality too
+- fix complex genertics to use the same singularaties as f64
+- why does plotly ignore my marker/line colours?
