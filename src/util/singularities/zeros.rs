@@ -5,13 +5,13 @@ use num_traits::{float::FloatCore};
 use crate::Barycentric;
 
 pub trait Zeros<T> {
+    /// finds zeros from an approximation
     fn zeros(&self) -> Vec<Complex<T>>;
 }
 
 impl<T> Zeros<T> for Barycentric<T>
 where T: RealField + ComplexFloat + FloatCore
 {
-    /// finds zeros from an approximation
     fn zeros(&self) -> Vec<Complex<T>> {
         let m: usize = self.weights.len();
         let mut e: Mat<T> = Mat::zeros(m + 1, m + 1);

@@ -5,7 +5,7 @@ edition = "2024"
 authors = ["zinkkkk"]
 repository = "https://github.com/zinkkkk/aaalligator"
 license = "MIT"
-keywords = ["AAA", "function approximation", "rational approximation"]
+keywords = ["AAA", "Adaptive Antoulas-Anderson", "function approximation", "rational approximation", "rational function", "interpolation", "data fitting"]
 readme = "README.md"
 
 [dependencies]

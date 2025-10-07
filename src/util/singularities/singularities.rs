@@ -14,13 +14,13 @@ pub struct Singularities<T>
 
 pub trait FindSingularities<T>
 {
+    /// returns a struct containing poles, poles residues, zeros, zeros residues
     fn przr(&self) -> Singularities<T>;
 }
 
 impl<T> FindSingularities<T> for Barycentric<T>
 where T: RealField + Float + FloatCore + ComplexFloat
 {
-    /// returns a struct containing poles, poles residues, zeros, zeros residues
     fn przr(&self) -> Singularities<T> {
 
         let poles = self.poles();

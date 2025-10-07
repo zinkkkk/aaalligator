@@ -9,12 +9,12 @@ fn main() {
 
     r.print_info();
     r.przr().print_przr_info();
-    //r.draw();
+    r.draw();
 
-    // let r = kite.into_bary();
-    // r.print_info();
-    // r.przr().print_przr_info();
-    // r.draw_with_pz();
+    let r = kite.into_bary();
+    r.print_info();
+    r.przr().print_przr_info();
+    r.draw_with_pz();
 
 }
 

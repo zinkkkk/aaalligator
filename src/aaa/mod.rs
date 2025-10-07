@@ -1,11 +1,9 @@
 pub mod continuum;
-pub mod fromfn;
 pub mod discrete;
-pub mod discrete_auto;
+pub mod into;
 mod tools;
 
 pub use continuum::*;
-pub use fromfn::*;
 pub use discrete::*;
-pub use discrete_auto::*;
+pub use into::*;
 pub(crate) use tools::*;

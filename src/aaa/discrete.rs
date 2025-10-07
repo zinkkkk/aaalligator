@@ -1,3 +1,5 @@
+use crate::*;
+
 use faer::Col;
 use faer::prelude::*;
 use faer::traits::ComplexField;
@@ -6,14 +8,13 @@ use num_traits::NumAssignOps;
 use num_traits::NumOps;
 use num_traits::ToPrimitive;
 
-use crate::*;
-
+/// AAA approximation from sets of data contrained in Vec type
 pub fn aaa_discreet<T>(
     f: Vec<T>,
     z: Vec<T>,
     degree: usize,
     tol: f64,
-    lookahead: i32
+    lookahead: usize
 ) -> Barycentric<T>
 where T: ComplexFloat + ComplexField + NumOps<T> + NumAssignOps<T>, f64: From<<T as ComplexField>::Real>
 {

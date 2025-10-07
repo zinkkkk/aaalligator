@@ -1,4 +1,3 @@
-pub mod consts_internal;
 pub mod evaluate;
 pub mod singularities;
 pub mod plotting;

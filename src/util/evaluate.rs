@@ -4,10 +4,12 @@ use num_traits::zero;
 use crate::Barycentric;
 
 pub trait Evaluate<T> {
+    /// evaluates a rational function for a single input value
     fn evaluate(&self, point: T) -> T;
 }
 
 pub trait EvaluateHandle<T> {
+    /// a function handle to evaluate a rational function for a single input value
     fn evaluate_handle(&self) -> impl Fn(T) -> T;
 }
 
@@ -41,10 +43,8 @@ where
     T: num_traits::NumAssignOps
     + ComplexFloat + std::iter::Sum
 {
-    /// returns a closure function to evaluate an approximation of type f(z)
     fn evaluate_handle(&self) -> impl Fn(T) -> T {
         |point: T| {
-
 
         if let Some(k) = self.nodes.iter().position(|&n| point == n) {
             return *self.values.get(k).unwrap();

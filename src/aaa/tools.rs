@@ -37,7 +37,8 @@ impl<T: std::fmt::Debug> Barycentric<T> {
     }
 }
 
-pub fn calculate_weights<T>(a: &Mat<T>) -> Col<T>
+/// SVD calculation of barycentric weights from Loewner matrix
+pub(crate) fn calculate_weights<T>(a: &Mat<T>) -> Col<T>
 where T: ComplexFloat + ComplexField, f64: From<<T as ComplexField>::Real>
 {
         let mut s;

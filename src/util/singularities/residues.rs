@@ -5,6 +5,7 @@ use num_traits::{float::FloatCore, zero};
 use crate::*;
 
 pub trait Residues<T> {
+    /// finds residues from an approximation
     fn residues(&self, poles: &[Complex<T>]) -> Vec<Complex<T>>;
 }
 

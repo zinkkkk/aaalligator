@@ -5,6 +5,7 @@ use num_traits::{NumAssignOps, ToPrimitive, zero};
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use crate::*;
 
+/// AAA approximation from single in single out functions
 pub fn aaa_continuum<T, F>(
     f: F,
     prenodes: Option<Vec<T>>,

@@ -4,13 +4,13 @@ use num_complex::{Complex, ComplexFloat};
 use num_traits::{float::FloatCore};
 
 pub trait Poles<T> {
+    /// finds poles from an approximation
     fn poles(&self) -> Vec<Complex<T>>;
 }
 
 impl<T> Poles<T> for Barycentric<T>
 where T: RealField + ComplexFloat + FloatCore
 {
-    /// finds poles from an approximation
     fn poles(&self) -> Vec<Complex<T>> {
 
         let m: usize = self.weights.len();
