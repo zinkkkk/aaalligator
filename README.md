@@ -3,7 +3,7 @@
 
 A rust variant of the AAA method described in "AAA rational approximation on a continuum" 2023 (Toby Driscoll, Yuji Nakatsukasa, Lloyd N. Trefethen) 10.48550/arXiv.2305.03677 https://arxiv.org/abs/2305.03677
 
-The method approximated single in single out functions of floating point or complex type (AAA-continuum) or fits to sets of values from a Vec (AAA-discreet)
+The method approximates single in single out functions of floating point or complex type (AAA-continuum) or fits to sets of values from a Vec (AAA-discreet), returning a barycentric rational function.
 
 This crate was taken down for a while for some refactoring that is mostly done, the main AAA functions are now generic over floats and Complex type but most of the supporting code like plotting and sinularaties have not been finished but are mostly implemented for f64 and Complex<f64>. Trying to get all the generics play nice is a bit of a chore...
 
