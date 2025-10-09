@@ -45,19 +45,11 @@ where T: ComplexFloat + ComplexField, f64: From<<T as ComplexField>::Real>
         let mut v;
         let mut w;
 
-        let mut bdp: Spec<BidiagParams, T> = default();
-        bdp.par_threshold = usize::MAX;
-        bdp.config.par_threshold = usize::MAX;
-
-        let mut qrp: Spec<QrParams, T> = default();
-        qrp.blocking_threshold = usize::MAX;
-        qrp.par_threshold = usize::MAX;
-
         let mut svdp: Spec<SvdParams, T> = default();
         svdp.recursion_threshold = usize::MAX;
         svdp.qr_ratio_threshold = f64::MAX;
-        svdp.bidiag = *bdp;
-        svdp.qr = *qrp;
+
+        let n_cores = rayon::current_num_threads();
 
         let (m, n) = a.shape();
 
@@ -72,13 +64,13 @@ where T: ComplexFloat + ComplexField, f64: From<<T as ComplexField>::Real>
                 s.as_mut(),
                 None,
                 Some(v.as_mut()),
-                Par::Seq,
+                Par::rayon(n_cores),
                 MemStack::new(&mut MemBuffer::new(linalg::svd::svd_scratch::<T>(
                     a.nrows(),
                     a.ncols(),
                     linalg::svd::ComputeSvdVectors::No,
                     linalg::svd::ComputeSvdVectors::Thin,
-                    Par::Seq,
+                    Par::rayon(n_cores),
                     svdp,
                 ))),
                 svdp,
@@ -110,13 +102,13 @@ where T: ComplexFloat + ComplexField, f64: From<<T as ComplexField>::Real>
                 s.as_mut(),
                 None,
                 Some(v.as_mut()),
-                Par::Seq,
+                Par::rayon(n_cores),
                 MemStack::new(&mut MemBuffer::new(linalg::svd::svd_scratch::<T>(
                     dim2,
                     dim2,
                     linalg::svd::ComputeSvdVectors::No,
                     linalg::svd::ComputeSvdVectors::Thin,
-                    Par::Seq,
+                    Par::rayon(n_cores),
                     svdp,
                 ))),
                 svdp,

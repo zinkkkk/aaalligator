@@ -84,7 +84,7 @@ impl DrawWithPz for Barycentric<Complex<f64>>
         let nmax = self.nodes.iter().map(|a| a.re()).reduce(f64::max).unwrap();
         let nmin = self.nodes.iter().map(|a| a.re()).reduce(f64::min).unwrap();
 
-        let xx: Vec<f64> = lin_space(nmin..=nmax, 1000).collect();
+        let xx: Vec<f64> = lin_space(nmin..=nmax, 3000).collect();
         let mut ptsmain: Vec<Complex64> = Vec::new();
 
         for i in &xx {
@@ -151,7 +151,7 @@ impl DrawBary for Barycentric<f64>
     let min = self.nodes.iter().cloned().reduce(f64::min).unwrap();
     let max = self.nodes.iter().cloned().reduce(f64::max).unwrap();
 
-    let xx: Vec<f64> = lin_space(min..=max, 5001).collect();
+    let xx: Vec<f64> = lin_space(min..=max, 3000).collect();
 
     let mut ptsmain: Vec<f64> = Vec::new();
 
@@ -177,7 +177,10 @@ impl DrawBary for Barycentric<f64>
 impl DrawBary for Barycentric<Complex64> {
     fn draw(&self) {
 
-    let xx: Vec<f64> = lin_space(-1.0..=1.0, 5000).collect();
+    let nmax = self.nodes.iter().map(|a| a.re()).reduce(f64::max).unwrap();
+    let nmin = self.nodes.iter().map(|a| a.re()).reduce(f64::min).unwrap();
+
+    let xx: Vec<f64> = lin_space(nmin..=nmax, 3000).collect();
 
     let mut ptsmain: Vec<Complex64> = Vec::new();
     let mut ptsre: Vec<f64> = Vec::new();
@@ -185,23 +188,26 @@ impl DrawBary for Barycentric<Complex64> {
     let mut ptsabs: Vec<f64> = Vec::new();
 
     for i in &xx {
-    let pts = self.evaluate(Complex64::new(*i, 0.0)).to_polar();
-    ptsre.push(pts.0);
-    ptsim.push(pts.1);
-    ptsabs.push(self.evaluate(Complex64::new(*i, 0.0)).abs());
-    ptsmain.push(self.evaluate(Complex64::new(*i, 0.0)));
+    let pts = self.evaluate(i.into());
+    ptsre.push(pts.re());
+    ptsim.push(pts.im());
+    ptsabs.push(pts.abs());
+    ptsmain.push(pts);
     }
 
     let x: Vec<f64> = ptsmain.iter().map(|f|f.re()).collect();
     let y: Vec<f64> = ptsmain.iter().map(|f|f.im()).collect();
 
-    let main = Scatter::new(x.clone(), y.clone())
+    let main = Scatter::new(x, y)
+        .mode(Mode::Lines).fill_color(Rgb::new(0, 0, 255)).name("Main");
+
+    let re = Scatter::new(xx.clone(), ptsre.clone())
         .mode(Mode::Lines).fill_color(Rgb::new(0, 0, 255)).name("Re");
 
-    let main2 = Scatter::new(xx.clone(), y)
+    let im = Scatter::new(xx.clone(), ptsim)
         .mode(Mode::Lines).fill_color(Rgb::new(0, 0, 255)).name("Im");
 
-    let main3 = Scatter::new(xx, ptsabs)
+    let abs = Scatter::new(xx, ptsabs)
         .mode(Mode::Lines).fill_color(Rgb::new(0, 0, 255)).name("Abs");
 
     let mut plot = Plot::new();
@@ -210,8 +216,9 @@ impl DrawBary for Barycentric<Complex64> {
     plot.set_layout(layout);
 
     plot.add_trace(main);
-    plot.add_trace(main2);
-    plot.add_trace(main3);
+    plot.add_trace(re);
+    plot.add_trace(im);
+    plot.add_trace(abs);
 
     plot.show();
     }
