@@ -9,6 +9,8 @@ fn main() {
     let z = lin_space(-1.0..=1.0, 500).collect::<Vec<f64>>();
     let f = z.iter().map(|&i| f_f64(i)).collect::<Vec<f64>>();
 
+    f.clone().interpolate_n(1000).draw();
+
     let r = (f, z).into_bary();
     r.draw();
 

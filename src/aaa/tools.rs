@@ -1,4 +1,4 @@
-use faer::{Col, Mat, Par, Spec, diag::{Diag}, dyn_stack::{MemBuffer, MemStack}, linalg::{self, qr::no_pivoting::factor::QrParams, svd::{SvdParams, bidiag::BidiagParams}}, prelude::default, traits::ComplexField, unzip, zip};
+use faer::{Col, Mat, Par, Spec, diag::Diag, dyn_stack::{MemBuffer, MemStack}, linalg::{self, svd::SvdParams}, prelude::default, traits::ComplexField, unzip, zip};
 use num_complex::ComplexFloat;
 use num_traits::zero;
 

@@ -39,3 +39,21 @@ where T: ComplexFloat + ComplexField + NumAssignOps<T> + num_traits::FromPrimiti
     aaa_discreet(self.0, self.1, len, 1e-13, len)
     }
 }
+
+pub trait InterpolateVec<T>
+{
+    /// interpolates a Vec<T> n times and returns as a Vec
+    fn interpolate_n(self, n: usize) -> Vec<T>;
+}
+
+impl<T> InterpolateVec<T> for Vec<T>
+where T: ComplexFloat + ComplexField + NumAssignOps<T> + num_traits::FromPrimitive, f64: From<<T as ComplexField>::Real>
+{
+    fn interpolate_n(self, n: usize) -> Vec<T> {
+    let len = self.len();
+    let z: Vec<T> = lin_space(T::from(-1.0).unwrap()..=T::from(1.0).unwrap(), len).collect();
+    let bary = aaa_discreet(self, z, len, 1e-13, len);
+    let nn: Vec<T> = lin_space(T::from(-1.0).unwrap()..=T::from(1.0).unwrap(), n).collect();
+    nn.iter().map(|i| bary.evaluate(*i)).collect()
+    }
+}

@@ -1,9 +1,14 @@
+use std::io::Read;
 use std::ops::Neg;
+use faer::traits::ComplexField;
 use hsl::HSL;
 use iter_num_tools::lin_space;
 use num_complex::Complex;
 use num_complex::Complex64;
 use num_complex::ComplexFloat;
+use num_traits::Float;
+use num_traits::NumAssignOps;
+use num_traits::real::Real;
 use plotly::Image;
 use plotly::color::NamedColor;
 use plotly::image::ColorModel;
@@ -221,6 +226,32 @@ impl DrawBary for Barycentric<Complex64> {
     plot.add_trace(abs);
 
     plot.show();
+    }
+}
+
+pub trait DrawVec {
+    /// draws a plot of an vec
+     fn draw(&self);
+}
+
+impl<T> DrawVec for Vec<T>
+where T: ComplexFloat + serde_core::ser::Serialize + num_traits::FromPrimitive + 'static
+{
+    fn draw(&self) {
+
+    let xx: Vec<T> = lin_space(T::from(-1.0).unwrap()..=T::from(1.0).unwrap(), self.len()).collect();
+
+    let main = Scatter::new(xx, self.to_vec())
+        .mode(Mode::Lines).fill_color(Rgb::new(0, 0, 255)).name("Plot");
+
+    let mut plot = Plot::new();
+
+    let layout = Layout::new().height(1000).width(1000).auto_size(false);
+    plot.set_layout(layout);
+
+    plot.add_trace(main);
+    plot.show();
+
     }
 }
  
